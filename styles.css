@@ -1,0 +1,163 @@
+/* General page */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: sans-serif;
+  background: #fff;
+}
+
+.main {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  left: -250px;
+  top: 0;
+  width: 250px;
+  height: 100%;
+  background: #e0f0ff;
+  box-shadow: 3px 0 10px rgba(0,0,0,0.2);
+  border-radius: 0 10px 10px 0;
+  transition: left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+/* Sidebar header */
+.sidebar-header {
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+/* Toggle triangle */
+.toggle {
+  position: absolute;
+  top: 50%;
+  right: -20px;
+  transform: translateY(-50%);
+  background: #e0f0ff;
+  width: 20px;
+  height: 40px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  user-select: none;
+}
+
+/* Block pool inside sidebar */
+.block-pool {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Blocks */
+.block {
+  width: 100%;
+  background: #c0e0ff;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+.block input {
+  pointer-events: none; /* Disable input capture for drag in sidebar */
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+/* Drag handle */
+.handle {
+  height: 20px;
+  background: #a0cfff;
+  border-radius: 3px;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  user-select: none;
+}
+
+/* Canvas */
+.canvas {
+  flex: 1;
+  margin-left: 0;
+  position: relative; /* For absolute placement of blocks */
+  background: #f9f9f9;
+  overflow: hidden;
+  transition: margin-left 0.3s ease;
+}
+
+/* SVG connections */
+.connections {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Canvas blocks */
+.canvas-block {
+  width: 100px;
+  height: 50px;
+  position: absolute;
+  cursor: grab;
+  resize: both;       /* allow resizing */
+  overflow: auto;
+  padding: 5px;
+  min-width: 50px;
+  min-height: 30px;
+  max-width: 300px;
+  max-height: 200px;
+  background: #c0e0ff;
+  border-radius: 5px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Canvas blocks editable */
+.canvas-block input {
+  pointer-events: auto; /* allow typing */
+  background: transparent;
+  border: 1px solid #aaa;
+  width: calc(100% - 10px);
+  margin: 5px;
+  outline: none;
+  font-size: 14px;
+}
+
+/* Shift canvas when sidebar open */
+.main.shifted {
+  margin-left: 250px;
+}
