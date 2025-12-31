@@ -293,28 +293,64 @@ function removeConnectionsOfBlock(block) {
 // ---------------- SIDEBAR EDITOR ----------------
 function showSidebarButtonEditor(block) {
   const links = JSON.parse(block.dataset.links || "[]");
+
   blockPool.innerHTML = "";
+  blockPool.style.display = "flex";
+  blockPool.style.flexDirection = "column";
+  blockPool.style.justifyContent = "flex-start";
+  blockPool.style.height = "100%";
+  blockPool.style.padding = "10px";
 
-  links.forEach((l, i) => {
-    const n = document.createElement("input");
-    n.value = l.name;
-    n.onchange = () => {
-      links[i].name = n.value;
+  links.forEach((linkObj, index) => {
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.flexDirection = "column";
+    row.style.marginBottom = "14px";
+    row.style.padding = "8px";
+    row.style.border = "1px solid #ddd";
+    row.style.borderRadius = "6px";
+
+    // Button name
+    const nameInput = document.createElement("input");
+    nameInput.value = linkObj.name;
+    nameInput.placeholder = `Button ${index + 1} Name`;
+
+    // URL
+    const urlInput = document.createElement("input");
+    urlInput.value = linkObj.url;
+    urlInput.placeholder = `Button ${index + 1} URL`;
+
+    // Actual clickable button
+    const actionBtn = document.createElement("button");
+    actionBtn.textContent = linkObj.name || "Open Link";
+    actionBtn.style.marginTop = "6px";
+    actionBtn.style.cursor = "pointer";
+
+    actionBtn.addEventListener("click", () => {
+      if (links[index].url) {
+        window.open(links[index].url, "_blank");
+      }
+    });
+
+    // Live updates
+    nameInput.addEventListener("input", (e) => {
+      links[index].name = e.target.value;
+      actionBtn.textContent = e.target.value || "Open Link";
       block.dataset.links = JSON.stringify(links);
-      saveState();
-    };
+    });
 
-    const u = document.createElement("input");
-    u.value = l.url;
-    u.onchange = () => {
-      links[i].url = u.value;
+    urlInput.addEventListener("input", (e) => {
+      links[index].url = e.target.value;
       block.dataset.links = JSON.stringify(links);
-      saveState();
-    };
+    });
 
-    blockPool.append(n, u);
+    row.appendChild(nameInput);
+    row.appendChild(urlInput);
+    row.appendChild(actionBtn);
+    blockPool.appendChild(row);
   });
 }
+
 // Save initial empty canvas state for undo baseline
 saveState();
 if (undoStack.length > 1) {
