@@ -1,13 +1,15 @@
-/* General page */
+/* === GENERAL PAGE === */
 body, html {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
-  font-family: sans-serif;
-  background: #fff;
+  font-family: "Inter", sans-serif;
+  background: #f7f9fc;
+  color: #333;
 }
 
+/* === MAIN LAYOUT === */
 .main {
   display: flex;
   width: 100%;
@@ -15,110 +17,215 @@ body, html {
   transition: margin-left 0.3s ease;
 }
 
-/* Sidebar */
+/* === SIDEBAR === */
 .sidebar {
   position: fixed;
-  left: -250px;
+  left: -360px;
   top: 0;
-  width: 250px;
+  width: 360px;
   height: 100%;
-  background: #e0f0ff;
-  box-shadow: 3px 0 10px rgba(0,0,0,0.2);
-  border-radius: 0 10px 10px 0;
-  transition: left 0.3s ease;
+  /* slightly stronger glass: subtle opacity + more blur for depth */
+  background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.14));
+  backdrop-filter: blur(16px) saturate(1.05);
+  -webkit-backdrop-filter: blur(16px) saturate(1.05);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 10px 30px rgba(9,30,66,0.08);
+  border-radius: 0 14px 14px 0;
+  transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.28s ease, transform 0.28s ease;
   display: flex;
   flex-direction: column;
   z-index: 1000;
+  overflow: visible; /* allow toggle to sit on the edge */
 }
 
 .sidebar.open {
   left: 0;
+  transform: scale(1.01);
+  box-shadow: 0 18px 46px rgba(9,30,66,0.12);
 }
 
-/* Sidebar header */
+.sidebar:hover {
+  transform: scale(1.01);
+  box-shadow: 0 14px 40px rgba(9,30,66,0.10);
+}
+
+/* === SIDEBAR HEADER === */
 .sidebar-header {
   width: 100%;
   text-align: center;
   font-size: 18px;
-  font-weight: bold;
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
+  font-weight: 600;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
   box-sizing: border-box;
-  margin-bottom: 10px;
+  background: #f0f4f8;
 }
 
-/* Toggle triangle */
 .toggle {
-  position: absolute;
+  position: absolute; /* positioned relative to sidebar so it moves with it */
+  right: -38px;       /* sit on the edge */
   top: 50%;
-  right: -20px;
   transform: translateY(-50%);
-  background: #e0f0ff;
-  width: 20px;
-  height: 40px;
-  border-radius: 4px;
+  background: rgba(74,144,226,0.12);
+  width: 40px;
+  height: 56px;
+  border-radius: 0 10px 10px 0;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-  user-select: none;
+
+/* Touch optimizations */
+#canvas {
+  touch-action: none; /* allow pointer events for dragging and gestures */
 }
 
-/* Block pool inside sidebar */
+.handle {
+  touch-action: none; /* prevent default browser gestures from interfering */
+  -ms-touch-action: none;
+  padding: 10px 8px; /* larger touch target */
+  min-height: 34px;
+}
+  justify-content: center;
+  box-shadow: 2px 6px 18px rgba(0,0,0,0.14);
+  z-index: 1500;
+  user-select: none;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.toggle:hover {
+  background: rgba(74,144,226,0.18);
+  transform: translateY(-50%) translateX(3px);
+}
+
+/* Arrow inside the toggle (pseudo-element so HTML can be empty) */
+.toggle::after {
+  content: "▶";
+  display: block;
+  font-size: 18px;
+  color: #1e4a8a;
+  transform: rotate(0deg);
+  transition: transform 0.24s cubic-bezier(.2,.9,.2,1);
+  transform-origin: center;
+}
+
+/* rotate arrow when toggle has .open */
+.toggle.open::after {
+  transform: rotate(180deg);
+}
+
+/* stronger open nudge and focus visuals */
+.toggle.open {
+  transform: translateY(-50%) translateX(6px) scale(1.03);
+}
+
+.toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 6px 18px rgba(30,74,138,0.12), 0 0 0 4px rgba(74,144,226,0.12);
+  transform: translateY(-50%) translateX(4px) scale(1.02);
+}
+
+.toggle:active {
+  transform: translateY(-50%) translateX(2px) scale(0.99);
+}
+
+
+/* === BLOCK POOL === */
 .block-pool {
   flex: 1;
-  padding: 10px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: calc(100% - 60px);
+  scrollbar-width: thin;
+  scrollbar-color: #b0c4db transparent;
 }
 
-/* Blocks */
+.block-pool::-webkit-scrollbar {
+  width: 8px;
+}
+
+.block-pool::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.block-pool::-webkit-scrollbar-thumb {
+  background-color: #b0c4db;
+  border-radius: 4px;
+}
+
+/* === SIDEBAR BLOCKS === */
 .block {
-  width: 100%;
-  background: #c0e0ff;
-  border-radius: 5px;
-  padding: 5px;
+  width: calc(100% - 12px);
+  --accent: #b8d7ff;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.02)), var(--block-bg, #e6f0ff);
+  border-radius: 10px;
+  padding: 12px;
+  margin: 0 6px;
+  box-sizing: border-box;
   cursor: grab;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  gap: 8px;
+  /* layered shadows for subtle depth */
+  --shadow-ambient: 0 2px 4px rgba(9,30,66,0.04);
+  --shadow-elev: 0 8px 20px rgba(11,22,40,0.06);
+  box-shadow: var(--shadow-ambient), var(--shadow-elev);
+  transition: transform 0.14s cubic-bezier(.2,.9,.2,1), box-shadow 0.18s ease;
+}
+
+.block:hover {
+  transform: translateY(-8px) scale(1.025);
+  --shadow-elev: 0 18px 44px rgba(11,22,40,0.12);
+  --shadow-ambient: 0 6px 12px rgba(9,30,66,0.06);
+  box-shadow: var(--shadow-ambient), var(--shadow-elev), 0 0 18px var(--type-color);
 }
 
 .block input {
-  pointer-events: none; /* Disable input capture for drag in sidebar */
+  pointer-events: none; /* disable drag interference */
   width: 100%;
   border: none;
   background: transparent;
   outline: none;
+  font-size: 14px;
 }
 
-/* Drag handle */
+/* === DRAG HANDLE === */
 .handle {
-  height: 20px;
-  background: #a0cfff;
-  border-radius: 3px;
+  height: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
+  border-radius: 6px;
   cursor: grab;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(10,25,45,0.9);
   user-select: none;
+  transition: transform 0.22s cubic-bezier(.2,.8,.2,1), filter 0.22s cubic-bezier(.2,.8,.2,1);
+  box-shadow: inset 0 2px 6px rgba(255,255,255,0.6), inset 0 -2px 6px rgba(0,0,0,0.06), 0 2px 8px rgba(9,30,66,0.04);
 }
 
-/* Canvas */
+.handle:hover {
+  transform: translateY(-2px) scale(1.01);
+  filter: brightness(1.04);
+  transition: transform 0.28s cubic-bezier(.2,.8,.2,1), filter 0.28s cubic-bezier(.2,.8,.2,1);
+}
+
+/* === CANVAS === */
 .canvas {
   flex: 1;
   margin-left: 0;
-  position: relative; /* For absolute placement of blocks */
-  background: #f9f9f9;
+  position: relative;
+  background: linear-gradient(180deg, #f6f9fd, #f3f7fb);
   overflow: hidden;
-  transition: margin-left 0.3s ease;
+  transition: margin-left 0.32s cubic-bezier(.2,.9,.2,1);
+  transform-origin: 0 0; /* make zoom scale from top-left for simpler coordinates */
 }
 
-/* SVG connections */
+/* === SVG CONNECTIONS === */
 .connections {
   position: absolute;
   top: 0;
@@ -128,36 +235,453 @@ body, html {
   pointer-events: none;
 }
 
-/* Canvas blocks */
+/* === CANVAS BLOCKS === */
 .canvas-block {
-  width: 100px;
-  height: 50px;
+  width: 160px;
+  height: auto;
   position: absolute;
   cursor: grab;
-  resize: both;       /* allow resizing */
-  overflow: auto;
-  padding: 5px;
-  min-width: 50px;
-  min-height: 30px;
-  max-width: 300px;
-  max-height: 200px;
-  background: #c0e0ff;
-  border-radius: 5px;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  resize: both;
+  overflow: hidden;
+  padding: 10px;
+  min-width: 100px;
+  min-height: 44px;
+  max-width: 420px;
+  max-height: 220px;
+  /* glassy canvas blocks: translucent with subtle blur */
+  background: rgba(255,255,255,0.20);
+  backdrop-filter: blur(8px) saturate(1.03);
+  -webkit-backdrop-filter: blur(8px) saturate(1.03);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 10px;
+  --shadow-ambient: 0 3px 6px rgba(9,30,66,0.05);
+  --shadow-elev: 0 10px 26px rgba(11,22,40,0.06);
+  box-shadow: var(--shadow-ambient), var(--shadow-elev);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: box-shadow 0.28s cubic-bezier(.2,.8,.2,1), transform 0.22s cubic-bezier(.2,.8,.2,1);
+  backdrop-filter: blur(8px);
+  box-sizing: border-box;
 }
 
-/* Canvas blocks editable */
+.canvas-block:hover {
+  transform: translateY(-9px);
+  --shadow-elev: 0 22px 58px rgba(11,22,40,0.14);
+  --shadow-ambient: 0 8px 18px rgba(9,30,66,0.07);
+  box-shadow: var(--shadow-ambient), var(--shadow-elev), 0 0 20px var(--type-color);
+  transition: box-shadow 0.32s cubic-bezier(.2,.8,.2,1), transform 0.26s cubic-bezier(.2,.8,.2,1);
+}
+
+/* type color variables for inner glow / ripples */
+.type-system { --type-color: rgba(255,74,74,0.28); --type-color-rgb: 255,74,74; }
+.type-component { --type-color: rgba(74,144,226,0.26); --type-color-rgb: 74,144,226; }
+.type-manufacturing { --type-color: rgba(76,175,80,0.22); --type-color-rgb: 76,175,80; }
+
+/* Gradient backgrounds per type (sidebar + canvas blocks) */
+.block.type-system, .canvas-block.type-system {
+  --accent: rgba(255,74,74,0.18);
+  background: linear-gradient(135deg, #ffd1d1, #ffaaaa);
+  color: rgba(30,20,20,0.95);
+  transition: background 0.28s ease, color 0.18s ease;
+}
+.block.type-component, .canvas-block.type-component {
+  --accent: rgba(74,144,226,0.18);
+  background: linear-gradient(135deg, #d1e0ff, #a8c8ff);
+  color: rgba(8,24,48,0.95);
+  transition: background 0.28s ease, color 0.18s ease;
+}
+.block.type-manufacturing, .canvas-block.type-manufacturing {
+  --accent: rgba(76,175,80,0.14);
+  background: linear-gradient(135deg, #d1ffd1, #a8ffa8);
+  color: rgba(8,24,20,0.95);
+  transition: background 0.28s ease, color 0.18s ease;
+}
+
+/* inner glow on hover */
+.block:hover, .canvas-block:hover { box-shadow: 0 18px 44px rgba(11,22,40,0.12), 0 0 18px var(--type-color); }
+
+/* Pressed state */
+.block:active, .canvas-block:active { transform: translateY(-2px) scale(0.995); }
+
+/* Ripple element */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Connection path styling: smooth, selectable, and animated */
+.connection-path {
+  stroke-linecap: round;
+  pointer-events: stroke;
+  transition: stroke-width 0.18s cubic-bezier(.2,.8,.2,1), stroke 0.16s ease, filter 0.16s ease;
+  stroke-width: 3;
+}
+
+.connection-path:hover {
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.08));
+  stroke-width: 4.5;
+}
+
+/* Invisible hit area for connections to improve touch/click targeting */
+.connection-hit {
+  cursor: pointer;
+  stroke: transparent;
+  pointer-events: stroke;
+}
+
+@keyframes ripple-anim {
+  to { transform: scale(5); opacity: 0; }
+}
+
+/* Animated placement for newly dropped blocks */
+@keyframes place-in {
+  0% { transform: scale(0.94); opacity: 0; }
+  60% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.canvas-block.placing {
+  animation: place-in 420ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+/* ensure blocks are positioned relatively for ripple */
+.block, .canvas-block { position: relative; overflow: hidden; }
+
 .canvas-block input {
-  pointer-events: auto; /* allow typing */
-  background: transparent;
-  border: 1px solid #aaa;
-  width: calc(100% - 10px);
-  margin: 5px;
+  pointer-events: auto;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.12);
+  width: calc(100% - 20px);
+  margin: 6px 4px;
   outline: none;
   font-size: 14px;
+  border-radius: 8px;
+  padding: 6px 8px;
+  transition: border-color 0.28s cubic-bezier(.2,.8,.2,1), box-shadow 0.28s cubic-bezier(.2,.8,.2,1);
+  /* soft inset for neumorphic feel */
+  box-shadow: inset 0 2px 6px rgba(255,255,255,0.6), inset 0 -2px 6px rgba(0,0,0,0.06);
+  box-sizing: border-box;
+  overflow: visible;
 }
 
-/* Shift canvas when sidebar open */
-.main.shifted {
-  margin-left: 250px;
+.canvas-block input:focus {
+  border-color: #4a90e2;
 }
+
+/* Canvas Blocks Color Coding */
+.canvas-block.type-system {
+  --accent: rgba(255,74,74,0.20);
+  background: linear-gradient(180deg, #ffd6d6 0%, #ffb3b3 60%);
+  border: 1px solid rgba(255,74,74,0.28);
+  color: rgba(30,18,18,0.96);
+  box-shadow: 1px 8px 26px rgba(255,74,74,0.06);
+}
+
+.canvas-block.type-component {
+  --accent: rgba(74,144,226,0.22);
+  background: linear-gradient(180deg, #d9e8ff 0%, #9fbefc 60%);
+  border: 1px solid rgba(74,144,226,0.30);
+  color: rgba(6,24,48,0.98);
+  box-shadow: 1px 8px 26px rgba(74,144,226,0.06);
+}
+
+.canvas-block.type-manufacturing {
+  --accent: rgba(76,175,80,0.18);
+  background: linear-gradient(180deg, #e6ffea 0%, #aef3a7 60%);
+  border: 1px solid rgba(76,175,80,0.26);
+  color: rgba(8,28,18,0.96);
+  box-shadow: 1px 8px 26px rgba(76,175,80,0.05);
+}
+
+/* Optional: change box-shadow to match type */
+.canvas-block.type-system {
+  box-shadow: 1px 6px 18px rgba(255,74,74,0.06);
+}
+.canvas-block.type-component {
+  box-shadow: 1px 6px 18px rgba(74,144,226,0.06);
+}
+.canvas-block.type-manufacturing {
+  box-shadow: 1px 6px 18px rgba(76,175,80,0.06);
+}
+  
+
+/* === SHIFT CANVAS WHEN SIDEBAR OPEN === */
+.main.shifted {
+  margin-left: 360px;
+}
+
+/* === REFRESH BUTTON (fixed, glassy) === */
+.refresh-btn {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 1400;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.22);
+  color: #1e4a8a;
+  font-weight: 700;
+  font-size: 18px;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(11,22,40,0.08);
+  backdrop-filter: blur(8px);
+  transition: background 0.18s ease, transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.refresh-btn:hover {
+  background: rgba(255,255,255,0.32);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(11,22,40,0.12);
+}
+
+.refresh-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+/* === CLEAR ALL BUTTON === */
+.clear-btn {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  z-index: 1400;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.22);
+  color: #e04b4b;
+  font-weight: 700;
+  font-size: 18px;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(11,22,40,0.08);
+  backdrop-filter: blur(8px);
+  transition: background 0.18s ease, transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.clear-btn:hover {
+  background: rgba(255,255,255,0.32);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(11,22,40,0.12);
+}
+
+.clear-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+/* === CONFIRM OVERLAY / MODAL === */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.confirm-overlay.visible { display: flex; }
+
+.confirm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(6,12,24,0.45);
+  backdrop-filter: blur(4px);
+}
+
+.confirm-modal {
+  position: relative;
+  z-index: 2100;
+  width: 340px;
+  background: rgba(255,255,255,0.96);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 20px 50px rgba(11,22,40,0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.confirm-modal h3 { margin:0; font-size:16px }
+.confirm-actions { display:flex; gap:8px; justify-content:flex-end }
+.confirm-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer }
+.confirm-actions .confirm-yes { background:#e04b4b; color:white }
+.confirm-actions .confirm-cancel { background:transparent }
+
+/* === SIDEBAR INPUTS & BUTTONS === */
+#blockPool input {
+  width: calc(100% - 12px);
+  padding: 4px 6px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  outline: none;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+#blockPool input:focus {
+  border-color: #4a90e2;
+}
+
+#blockPool button {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: none;
+  background: #4a90e2;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+#blockPool button:hover {
+  background: #357abd;
+  transform: translateY(-1px);
+}
+
+/* === HR & SECTION DIVIDERS === */
+hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 10px 0;
+}
+
+/* === SELECTS (styled dropdowns) === */
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  padding: 6px 38px 6px 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(150,160,180,0.18);
+  background: linear-gradient(180deg, rgba(255,255,255,0.66), rgba(255,255,255,0.45));
+  color: rgba(10,25,45,0.95);
+  box-shadow: 0 4px 12px rgba(11,22,40,0.04), inset 0 -1px rgba(0,0,0,0.02);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'><path fill='%231e4a8a' d='M7 8L0 0h14z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: box-shadow 0.15s ease, transform 0.08s ease, border-color 0.12s ease;
+}
+
+select:focus, select:focus-visible {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 10px 28px rgba(74,144,226,0.12), 0 0 0 4px rgba(74,144,226,0.06);
+  transform: translateY(-1px);
+}
+
+/* Hide default IE dropdown */
+select::-ms-expand { display: none; }
+
+.block-pool select { margin: 8px 0; }
+
+/* Options have limited styling support but ensure legibility */
+option {
+  background: rgba(255,255,255,0.98);
+  color: rgba(10,25,45,0.95);
+}
+
+/* === LINK ROWS / POPUP === */
+.link-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.link-button {
+  flex: 1;
+  padding: 8px 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+  border: 1px solid rgba(150,160,180,0.12);
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  color: rgba(10,25,45,0.95);
+  box-shadow: 0 6px 18px rgba(11,22,40,0.04);
+}
+
+.link-button:hover { transform: translateY(-2px); }
+
+.link-edit, .link-del {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255,255,255,0.22);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(11,22,40,0.04);
+}
+
+.link-edit:hover, .link-del:hover { transform: translateY(-2px); }
+
+.link-popup {
+  position: relative;
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(150,160,180,0.08);
+  box-shadow: 0 12px 28px rgba(11,22,40,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.link-popup input { padding: 8px; border: 1px solid rgba(150,160,180,0.12); border-radius: 6px; }
+.link-popup-actions { display:flex; gap:8px; justify-content:flex-end; }
+.link-popup-actions button { padding:6px 10px; border-radius:6px; border:none; cursor:pointer }
+.link-popup-actions button:first-child { background:#4a90e2; color:white }
+.link-popup-actions button:last-child { background:transparent }
+
+/* Shared Params modal styles */
+.shared-params-modal {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(150,160,180,0.08);
+  box-shadow: 0 12px 28px rgba(11,22,40,0.08);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.shared-params-table { display:flex; flex-direction:column; gap:6px }
+.shared-param-row { display:flex; gap:8px; align-items:center }
+.shared-param-row input { flex:1; padding:8px; border:1px solid rgba(150,160,180,0.08); border-radius:6px }
+.shared-params-actions { display:flex; gap:8px; justify-content:flex-end }
+.shared-params-actions button { padding:6px 10px; border-radius:6px; border:none; cursor:pointer }
+.shared-params-actions button:first-child { background:#4a90e2; color:#fff }
+
+/* Processes manager styles */
+.processes-modal {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(150,160,180,0.08);
+  box-shadow: 0 12px 28px rgba(11,22,40,0.08);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.process-row { display:flex; gap:8px; align-items:center }
+.process-row input { flex:1; padding:8px; border:1px solid rgba(150,160,180,0.08); border-radius:6px }
+.processes-actions { display:flex; gap:8px; justify-content:flex-end }
+.processes-actions button { padding:6px 10px; border-radius:6px; border:none; cursor:pointer }
+.manufacturing-row { display:flex; gap:8px; align-items:center; justify-content:space-between; margin-bottom:8px }
+.manufacturing-row span { flex:1 }
+.manufacturing-row select { min-width:140px }
