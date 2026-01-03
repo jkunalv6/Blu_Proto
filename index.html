@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <link rel="icon" href="favicon.png" type="image/png">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,16 +14,28 @@
     <div id="sidebar" class="sidebar">
       <div id="sidebarHeader" class="sidebar-header">Select a block</div>
       <div id="blockPool" class="block-pool"></div>
-      <div id="toggle" class="toggle">&#9654;</div>
+      <div id="toggle" class="toggle"></div>
     </div>
 
     <!-- Canvas -->
     <div id="canvas" class="canvas">
       <svg id="connections" class="connections"></svg>
     </div>
+    
+    <!-- Confirm modal -->
+    <div class="confirm-overlay" aria-hidden="true">
+      <div class="confirm-backdrop" onclick="document.querySelector('.confirm-overlay')?.classList.remove('visible')"></div>
+      <div class="confirm-modal" role="dialog" aria-modal="true" aria-label="Clear confirmation">
+        <h3>Clear all items?</h3>
+        <div>Are you sure you want to remove all blocks and connections? This can be undone with Undo (Ctrl/Cmd+Z).</div>
+        <div class="confirm-actions">
+          <button class="confirm-cancel" onclick="document.querySelector('.confirm-overlay')?.classList.remove('visible')">Cancel</button>
+          <button class="confirm-yes" id="confirmClearBtn">Clear</button>
+        </div>
+      </div>
+    </div>
   </div>
 
 <script src="script.js"></script>
 </body>
 </html>
-
